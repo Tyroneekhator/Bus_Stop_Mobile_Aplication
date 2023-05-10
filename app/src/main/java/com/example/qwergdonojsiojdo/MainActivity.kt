@@ -273,7 +273,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 val items = ItemizedIconOverlay(this@MainActivity, arrayListOf<OverlayItem>(), markerGestureListener)
                 // loop through the list of restaurants
                 intrests.forEach {
-                    val inf =" name: ${it.name} type: ${it.type} description: ${it.descritpion}"
+                    val inf =" name: ${it.name} type: ${it.type} descriptions: ${it.descritpion}"
                     val new_res_item =OverlayItem(it.name,inf, GeoPoint(it.latitude, it.longitude))
                     items.addItem(new_res_item)
                     map1.overlays.add(items)
