@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">QWERGDONOJSIOJDO</string>
+    <string name="addrestaurant">Add New Restaurant</string>
+    <string name="titleaActivityLayoutPOI">Add A POI</string>
+    <string name="POIname">Name:</string>
+    <string name="POITYPE">Type:</string>
+    <string name="POIDESCRIPTION">Descritpion:</string>
+    <string name="btnaddrestaurant">Add Restaurant</string>
+    <string name="mapview">Map</string>
+    <string name="newpois">Add a new POI</string>
+</resources>
