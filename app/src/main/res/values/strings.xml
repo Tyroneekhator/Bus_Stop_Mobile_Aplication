@@ -1,11 +1,10 @@
 <resources>
-    <string name="app_name">QWERGDONOJSIOJDO</string>
-    <string name="addrestaurant">Add New Restaurant</string>
-    <string name="titleaActivityLayoutPOI">Add A POI</string>
-    <string name="POIname">Name:</string>
-    <string name="POITYPE">Type:</string>
-    <string name="POIDESCRIPTION">Descritpion:</string>
-    <string name="btnaddrestaurant">Add Restaurant</string>
+    <string name="app_name">Tyrone Ekhator</string>
+    <string name="titleaActivityLayoutPOI">Solent Bus Stop Finder</string>
+    <string name="POIname">Number:</string>
+    <string name="POITYPE">Bus Company:</string>
+    <string name="POIDESCRIPTION">Final Description:</string>
+    <string name="btnaddrestaurant">Add Bus Stop</string>
     <string name="mapview">Map</string>
-    <string name="newpois">Add a new POI</string>
+    <string name="newpois">Add a new bus stop</string>
 </resources>

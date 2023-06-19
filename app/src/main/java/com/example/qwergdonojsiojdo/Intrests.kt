@@ -1,4 +1,4 @@
-package com.example.qwergdonojsiojdo
+package com.example.tyroneekhator
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -8,11 +8,11 @@ import androidx.room.*
 @Entity(tableName = "intrests")
 data class Intrests(
     @PrimaryKey(autoGenerate = true) val id : Long,
-    @ColumnInfo(name = "name")
+    @ColumnInfo(name = "number")
     val name: String,
-    @ColumnInfo(name = "type")
+    @ColumnInfo(name = "bus_company")
     val type: String,
-    @ColumnInfo(name = "descritpion")
+    @ColumnInfo(name = "final_destination")
     val descritpion: String,
     @ColumnInfo(name = "latitude")
     val latitude: Double,

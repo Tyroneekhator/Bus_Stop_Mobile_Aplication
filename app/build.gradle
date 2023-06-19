@@ -4,11 +4,11 @@ plugins {
 }
 apply plugin: 'kotlin-kapt'
 android {
-    namespace 'com.example.qwergdonojsiojdo'
+    namespace 'com.example.tyroneekhator'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.qwergdonojsiojdo"
+        applicationId "com.example.tyroneekhator"
         minSdk 24
         targetSdk 33
         versionCode 1

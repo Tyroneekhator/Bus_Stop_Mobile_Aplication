@@ -1,4 +1,4 @@
-package com.example.qwergdonojsiojdo
+package com.example.tyroneekhator
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -24,6 +24,9 @@ import org.osmdroid.views.MapView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.fuel.json.responseJson
+import com.github.kittinunf.result.Result
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
     var longitude = 0.0
     var showingDatabaseIntrests = false;
     var upload = false
+    var showingWebIntrest = false;
 
 
 
@@ -68,10 +72,10 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 // get the map by id
                 map1 = findViewById<MapView>(R.id.map1)
                 // set the zoom map
-                map1.controller.setZoom(11.0)
+                map1.controller.setZoom(8.5)
                 // set the map center to this coordenates
                 map1.controller.setCenter(GeoPoint(latitude, longitude))
-                map1
+
 
             }
 
@@ -88,9 +92,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 // get the values textfields
                 // since we can get  the values will get the by id and then parsing into strings
 
-                val editText_name = fragmentView.findViewById<EditText>(R.id.et1name)
-                val editText_type = fragmentView.findViewById<EditText>(R.id.et2type)
-                val editText_description = fragmentView.findViewById<EditText>(R.id.et3description)
+                val editText_number = fragmentView.findViewById<EditText>(R.id.et1name)
+                val editText_company = fragmentView.findViewById<EditText>(R.id.et2type)
+                val editText_destination = fragmentView.findViewById<EditText>(R.id.et3description)
                 //get the button to add an eventlister
                 val button_add = fragmentView.findViewById<Button>(R.id.btnadd1)
 
@@ -99,9 +103,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 button_add.setOnClickListener {
                     // parse into string
 
-                    val name = editText_name.text.toString()
-                    val type = editText_type.text.toString()
-                    val description = editText_description.text.toString()
+                    val number = editText_number.text.toString()
+                    val company = editText_company.text.toString()
+                    val destination = editText_destination.text.toString()
 
                     // handle that editext after add new intrest still have the value on it
                     //add code to handle the preference to add to web
@@ -114,11 +118,14 @@ class MainActivity : AppCompatActivity(), LocationListener {
                     }else{
                         // send error
                     }
-                    addPOIToDatabase(name, type, description)
+                    addPOIToDatabase(number, company, destination)
                 }
 
             }
         }
+
+
+
 
         // handle fragments
 
@@ -206,7 +213,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
 
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.preferences ->{
@@ -228,11 +234,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     // adds pois to the database
 
-    fun addPOIToDatabase(name: String, type: String, description: String){
+    fun addPOIToDatabase(number:String , type: String, description: String){
 
         val db = IntrestsDatabase.getDatabase(application)
 
-        val newIntrests = Intrests(0, name, type, description, latitude, longitude)
+        val newIntrests = Intrests(0, number, type, description, latitude, longitude)
         //use lifecycle to run in a second background
         lifecycleScope.launch {
             withContext(Dispatchers.IO){
@@ -273,26 +279,80 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 val items = ItemizedIconOverlay(this@MainActivity, arrayListOf<OverlayItem>(), markerGestureListener)
                 // loop through the list of restaurants
                 intrests.forEach {
-                    val inf =" name: ${it.name} type: ${it.type} descriptions: ${it.descritpion}"
+                    val inf =" number: ${it.name} type: ${it.type} descriptions: ${it.descritpion}"
                     val new_res_item =OverlayItem(it.name,inf, GeoPoint(it.latitude, it.longitude))
                     items.addItem(new_res_item)
                     map1.overlays.add(items)
-                }
 
+                }
+                map1.invalidate()
 
             }
-            map1.invalidate()
+
         }
     }
     //----------------------------------------------------------------------------------------------------------------------------
 
 
+    // get data from the web API
+
+    fun getRestaurantsFromWebApi(){
+        // set the url of the API
+        showingWebIntrest=true
+        var url = "http://10.0.2.2:3000/busstops/all"
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO){
+                url.httpGet().responseJson{ request, response, result ->
+                    when(result){
+                        is  Result.Success ->{
+                            val jsonArray = result.get().array()
+
+                            //for markers
+                            val markerGestureListener = object:
+                                ItemizedIconOverlay.OnItemGestureListener<OverlayItem>
+                            {
+                                override fun onItemLongPress(i: Int, item: OverlayItem) : Boolean
+                                {
+                                    Toast.makeText(this@MainActivity, item.snippet, Toast.LENGTH_SHORT).show()
+                                    return true
+                                }
+
+                                override fun onItemSingleTapUp(i: Int, item: OverlayItem): Boolean
+                                {
+                                    Toast.makeText(this@MainActivity, item.snippet, Toast.LENGTH_SHORT).show()
+                                    return true
+                                }
+                            }
+                            //
+                            val items = ItemizedIconOverlay(this@MainActivity, arrayListOf<OverlayItem>(), markerGestureListener)
+                            for (i in 0  until jsonArray.length()){
+                                val currentObject = jsonArray.getJSONObject(i)
+                                // str get new value for the second value of Overlay
+
+                                val new_res_item = OverlayItem(currentObject.getString("number"), "${currentObject.getString("number")} ${currentObject.getString("type")} ${currentObject.getString("descriptions")}\n" , GeoPoint(currentObject.getDouble("latitude"), currentObject.getDouble("longitude")))
+                                items.addItem(new_res_item)
+                                map1.overlays.add(items)
+                            }
+                            map1.invalidate()
+                        }
+                        is Result.Failure ->{
+                            Toast.makeText(this@MainActivity, result.error.message, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+
+
+
+        }
+    }
 
     override fun onResume() {
         super.onResume()
         val preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
         upload = preferences.getBoolean("upload", false)
     }
+
 
 
 }

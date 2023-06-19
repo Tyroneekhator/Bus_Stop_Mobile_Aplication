@@ -1,4 +1,4 @@
-package com.example.qwergdonojsiojdo
+package com.example.tyroneekhator
 
 import androidx.room.*
 
@@ -8,14 +8,15 @@ import androidx.room.*
 interface IntrestsDao{
 
 
-    // Get all restaurants of the database
+    // Get all bustops by the database
     @Query("SELECT * FROM intrests")
     fun getAllIntrests(): List<Intrests>
 
 
-    // Get a restaurant o restaurants by name
-    @Query("SELECT * FROM intrests WHERE name=:name")
+    // Get  bustops by number
+    @Query("SELECT * FROM intrests WHERE number=:name")
     fun getIntrestByName(name: String): Intrests?
+
 
 
     // Get a restaurant by id
@@ -23,12 +24,12 @@ interface IntrestsDao{
     fun getIntrestById(id: Int): Intrests
 
 
-    // Get restaurant by cuisine
-    @Query("SELECT * FROM intrests WHERE type=:type")
+    // Get restaurant by bus_company
+    @Query("SELECT * FROM intrests WHERE bus_company=:type")
     fun getIntrestsByType(type: String): List<Intrests>
 
 
-    // insert a restaurant into the database
+    // insert a bus stop into the database
     @Insert
     fun insertNewIntrest(intrests: Intrests) : Long
 

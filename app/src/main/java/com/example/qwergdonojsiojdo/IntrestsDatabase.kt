@@ -1,10 +1,10 @@
-package com.example.qwergdonojsiojdo
+package com.example.tyroneekhator
 
 import androidx.room.*
 import android.content.Context
 
 // database object
-@Database(entities = arrayOf(Intrests::class), version = 2, exportSchema = false)
+@Database(entities = arrayOf(Intrests::class), version = 3, exportSchema = false)
 public abstract class IntrestsDatabase: RoomDatabase(){
     abstract fun IntrestsDao(): IntrestsDao
     companion object{
