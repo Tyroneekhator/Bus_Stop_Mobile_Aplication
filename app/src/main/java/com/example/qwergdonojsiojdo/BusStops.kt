@@ -5,15 +5,15 @@ import androidx.room.PrimaryKey
 import androidx.room.*
 
 // data entities
-@Entity(tableName = "intrests")
-data class Intrests(
+@Entity(tableName = "busStops")
+data class BusStops(
     @PrimaryKey(autoGenerate = true) val id : Long,
     @ColumnInfo(name = "number")
-    val name: String,
+    val number: String,
     @ColumnInfo(name = "bus_company")
     val type: String,
     @ColumnInfo(name = "final_destination")
-    val descritpion: String,
+    val destination: String,
     @ColumnInfo(name = "latitude")
     val latitude: Double,
     @ColumnInfo( name = "longitude")

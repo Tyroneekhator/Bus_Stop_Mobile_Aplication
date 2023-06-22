@@ -24,9 +24,6 @@ import org.osmdroid.views.MapView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
-import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.json.responseJson
-import com.github.kittinunf.result.Result
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,9 +39,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
     // set the variables for latitude and longitude
     var latitude = 0.0
     var longitude = 0.0
-    var showingDatabaseIntrests = false;
+    var showingDatabaseBusStops  = false;
     var upload = false
-    var showingWebIntrest = false;
+
 
 
 
@@ -75,7 +72,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 map1.controller.setZoom(8.5)
                 // set the map center to this coordenates
                 map1.controller.setCenter(GeoPoint(latitude, longitude))
-
+                getBusStopFromDatabase()
 
             }
 
@@ -87,7 +84,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
 
         // second fragment
-        class Frag2: Fragment(R.layout.add_intrest){
+        class Frag2: Fragment(R.layout.add_bus_stop){
             override fun onViewCreated(fragmentView: View, b: Bundle?) {
                 // get the values textfields
                 // since we can get  the values will get the by id and then parsing into strings
@@ -118,7 +115,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
                     }else{
                         // send error
                     }
-                    addPOIToDatabase(number, company, destination)
+                    addBusStopToDatabase(number, company, destination)
                 }
 
             }
@@ -136,7 +133,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         // map
         val fragment1 = Frag1()
-        // add resturant
+        // add bus_stop
         val fragment2 = Frag2()
 
         // set up navigation
@@ -148,8 +145,8 @@ class MainActivity : AppCompatActivity(), LocationListener {
             when(it.itemId){
                 R.id.lookmap ->{
                     fragment = fragment1
-                    getRestaurantsFromDatabase()
-                    //getRestaurantsFromWebApi()
+                    getBusStopFromDatabase()
+
                 }
                 R.id.newpointsofintrest ->{
                     fragment = fragment2
@@ -209,7 +206,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
     }
     //override onoptionsitemselected
     // when the item with x value id is selected then this does x
-    // use for add restaurant and get the intent
+    // use for add busStop and get the intent
 
 
 
@@ -232,33 +229,32 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     // database stuff
 
-    // adds pois to the database
+    // adds bustops to the database
 
-    fun addPOIToDatabase(number:String , type: String, description: String){
+    fun addBusStopToDatabase(number:String , type: String, description: String){
 
-        val db = IntrestsDatabase.getDatabase(application)
+        val db = BusStopsDatabase.getDatabase(application)
 
-        val newIntrests = Intrests(0, number, type, description, latitude, longitude)
+        val newBusStops = BusStops(0, number, type, description, latitude, longitude)
         //use lifecycle to run in a second background
         lifecycleScope.launch {
             withContext(Dispatchers.IO){
-                db.IntrestsDao().insertNewIntrest(newIntrests)
+                db.BusStopsDao().insertNewbusStop(newBusStops)
             }
         }
     }
 
     //-----------------------------------------------------------------------------------------------
 
-    fun getRestaurantsFromDatabase(){
+    fun getBusStopFromDatabase(){
 
-        val db = IntrestsDatabase.getDatabase(application)
-        showingDatabaseIntrests = true
+        val db = BusStopsDatabase.getDatabase(application)
+        showingDatabaseBusStops = true
         // use lifecycle to run in background
-        // not main treat to interrup
         lifecycleScope.launch {
             withContext(Dispatchers.IO){
-                // get all intrests
-                val intrests = db.IntrestsDao().getAllIntrests()
+                // get all busStops
+                val busStops = db.BusStopsDao().getAllbusStops()
                 //
                 val markerGestureListener = object:
                     ItemizedIconOverlay.OnItemGestureListener<OverlayItem>
@@ -277,80 +273,32 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 }
                 //
                 val items = ItemizedIconOverlay(this@MainActivity, arrayListOf<OverlayItem>(), markerGestureListener)
-                // loop through the list of restaurants
-                intrests.forEach {
-                    val inf =" number: ${it.name} type: ${it.type} descriptions: ${it.descritpion}"
-                    val new_res_item =OverlayItem(it.name,inf, GeoPoint(it.latitude, it.longitude))
-                    items.addItem(new_res_item)
-                    map1.overlays.add(items)
+                // loop through the list of bustops
+                busStops.forEach {
+                    val inf =" number: ${it.number} Bus Company: ${it.type} destination: ${it.destination}"
+                    val new_bus_item =OverlayItem(it.number,inf, GeoPoint(it.latitude, it.longitude))
+                    items.addItem(new_bus_item)
 
                 }
-                map1.invalidate()
+
+                map1.overlays.add(items)
+
 
             }
 
         }
+
     }
     //----------------------------------------------------------------------------------------------------------------------------
 
 
-    // get data from the web API
-
-    fun getRestaurantsFromWebApi(){
-        // set the url of the API
-        showingWebIntrest=true
-        var url = "http://10.0.2.2:3000/busstops/all"
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO){
-                url.httpGet().responseJson{ request, response, result ->
-                    when(result){
-                        is  Result.Success ->{
-                            val jsonArray = result.get().array()
-
-                            //for markers
-                            val markerGestureListener = object:
-                                ItemizedIconOverlay.OnItemGestureListener<OverlayItem>
-                            {
-                                override fun onItemLongPress(i: Int, item: OverlayItem) : Boolean
-                                {
-                                    Toast.makeText(this@MainActivity, item.snippet, Toast.LENGTH_SHORT).show()
-                                    return true
-                                }
-
-                                override fun onItemSingleTapUp(i: Int, item: OverlayItem): Boolean
-                                {
-                                    Toast.makeText(this@MainActivity, item.snippet, Toast.LENGTH_SHORT).show()
-                                    return true
-                                }
-                            }
-                            //
-                            val items = ItemizedIconOverlay(this@MainActivity, arrayListOf<OverlayItem>(), markerGestureListener)
-                            for (i in 0  until jsonArray.length()){
-                                val currentObject = jsonArray.getJSONObject(i)
-                                // str get new value for the second value of Overlay
-
-                                val new_res_item = OverlayItem(currentObject.getString("number"), "${currentObject.getString("number")} ${currentObject.getString("type")} ${currentObject.getString("descriptions")}\n" , GeoPoint(currentObject.getDouble("latitude"), currentObject.getDouble("longitude")))
-                                items.addItem(new_res_item)
-                                map1.overlays.add(items)
-                            }
-                            map1.invalidate()
-                        }
-                        is Result.Failure ->{
-                            Toast.makeText(this@MainActivity, result.error.message, Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
-            }
 
 
-
-        }
-    }
 
     override fun onResume() {
         super.onResume()
         val preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
-        upload = preferences.getBoolean("upload", false)
+        upload = preferences.getBoolean("autoupload", false)
     }
 
 

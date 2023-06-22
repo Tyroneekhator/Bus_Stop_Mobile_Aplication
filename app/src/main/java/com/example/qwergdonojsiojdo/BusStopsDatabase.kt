@@ -4,20 +4,20 @@ import androidx.room.*
 import android.content.Context
 
 // database object
-@Database(entities = arrayOf(Intrests::class), version = 3, exportSchema = false)
-public abstract class IntrestsDatabase: RoomDatabase(){
-    abstract fun IntrestsDao(): IntrestsDao
+@Database(entities = arrayOf(BusStops::class), version = 4, exportSchema = false)
+public abstract class BusStopsDatabase: RoomDatabase(){
+    abstract fun BusStopsDao(): BusStopsDao
     companion object{
         @Volatile
-        private var instance: IntrestsDatabase? = null
+        private var instance: BusStopsDatabase? = null
 
-        fun getDatabase(ctx:Context): IntrestsDatabase{
+        fun getDatabase(ctx:Context): BusStopsDatabase{
             var tmpInstance = instance
             if(tmpInstance == null){
                 tmpInstance = Room.databaseBuilder(
                     ctx.applicationContext,
-                    IntrestsDatabase::class.java,
-                    "RestaurantDatabase"
+                    BusStopsDatabase::class.java,
+                    "BusStopsDatabase"
                 ).fallbackToDestructiveMigration().build()
                 instance = tmpInstance
             }
