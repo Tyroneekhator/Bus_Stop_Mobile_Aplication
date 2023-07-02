@@ -8,23 +8,23 @@ import androidx.room.*
 interface BusStopsDao{
 
 
-    // Get all bustops by the database
+    // Get all bus stops by the database
     @Query("SELECT * FROM busStops")
     fun getAllbusStops(): List<BusStops>
 
 
-    // Get  bustops by number
+    // Get  bus stops by number
     @Query("SELECT * FROM busStops WHERE number=:name")
     fun getbusStopByName(name: String): BusStops?
 
 
 
-    // Get a restaurant by id
+    // Get a bus stops by id
     @Query("SELECT * FROM busStops WHERE id=:id")
     fun getbusStopsById(id: Int): BusStops
 
 
-    // Get restaurant by bus_company
+    // Get bus stops by bus_company
     @Query("SELECT * FROM busStops WHERE bus_company=:type")
     fun getbusStopsByType(type: String): List<BusStops>
 
